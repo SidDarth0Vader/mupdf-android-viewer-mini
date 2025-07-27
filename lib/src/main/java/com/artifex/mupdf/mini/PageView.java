@@ -25,6 +25,7 @@ public class PageView extends View implements
 
 	protected float pageScale, viewScale, minScale, maxScale;
 	protected Bitmap bitmap;
+	protected boolean isColorInverted;
 	protected int bitmapW, bitmapH;
 	protected int canvasW, canvasH;
 	protected int scrollX, scrollY;
@@ -71,6 +72,7 @@ public class PageView extends View implements
 		errorPath.lineTo(100, 100);
 		errorPath.moveTo(100, -100);
 		errorPath.lineTo(-100, 100);
+		isColorInverted = false;
 	}
 
 	public void setActionListener(DocumentActivity l) {
@@ -96,7 +98,7 @@ public class PageView extends View implements
 		linkBounds = lbs;
 		linkURIs = lus;
 		hits = hs;
-		bitmap = b;
+		bitmap = isColorInverted?invertColors(b):b;
 		bitmapW = (int)(bitmap.getWidth() * viewScale / zoom);
 		bitmapH = (int)(bitmap.getHeight() * viewScale / zoom);
 		scroller.forceFinished(true);
@@ -107,6 +109,20 @@ public class PageView extends View implements
 		pageScale = zoom;
 		invalidate();
 	}
+
+	private Bitmap invertColors(Bitmap original) {
+		Bitmap invertedBitmap = Bitmap.createBitmap(original.getWidth(), original.getHeight(), original.getConfig());
+		int[] pixels = new int[original.getWidth() * original.getHeight()];
+		original.getPixels(pixels, 0, original.getWidth(), 0, 0, original.getWidth(), original.getHeight());
+
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = (0xFFFFFFFF - pixels[i]) | (pixels[i] & 0xFF000000);
+		}
+
+		invertedBitmap.setPixels(pixels, 0, invertedBitmap.getWidth(), 0, 0, invertedBitmap.getWidth(), invertedBitmap.getHeight());
+		return invertedBitmap;
+	}
+
 
 	public void resetHits() {
 		hits = null;
