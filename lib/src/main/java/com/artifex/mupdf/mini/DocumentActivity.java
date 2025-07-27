@@ -77,6 +77,7 @@ public class DocumentActivity extends Activity
 	protected PageView pageView;
 	protected View actionBar;
 	protected TextView titleLabel;
+	protected View colorInvertButton;
 	protected View searchButton;
 	protected View searchBar;
 	protected EditText searchText;
@@ -260,6 +261,15 @@ public class DocumentActivity extends Activity
 			public void onStartTrackingTouch(SeekBar seekbar) {}
 			public void onStopTrackingTouch(SeekBar seekbar) {
 				gotoPage(newProgress);
+			}
+		});
+
+		colorInvertButton = findViewById(R.id.color_invert_button);
+		colorInvertButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i(APP, "Inverted colour");
+				pageView.isColorInverted = !pageView.isColorInverted;
+				loadPage();
 			}
 		});
 
