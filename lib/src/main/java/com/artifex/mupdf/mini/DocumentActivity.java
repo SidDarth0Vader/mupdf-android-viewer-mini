@@ -3,7 +3,6 @@ package com.artifex.mupdf.mini;
 import com.artifex.mupdf.fitz.*;
 import com.artifex.mupdf.fitz.android.*;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -11,13 +10,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.FileUriExposedException;
-import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,10 +34,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -77,7 +70,7 @@ public class DocumentActivity extends Activity
 	protected PageView pageView;
 	protected View actionBar;
 	protected TextView titleLabel;
-	protected View colorInvertButton;
+	protected View luminanceInvertButton;
 	protected View searchButton;
 	protected View searchBar;
 	protected EditText searchText;
@@ -99,6 +92,7 @@ public class DocumentActivity extends Activity
 	protected boolean stopSearch;
 	protected Stack<Integer> history;
 	protected boolean wentBack;
+	protected boolean isLuminanceInverted;
 
 	private String toHex(byte[] digest) {
 		StringBuilder builder = new StringBuilder(2 * digest.length);
@@ -264,11 +258,11 @@ public class DocumentActivity extends Activity
 			}
 		});
 
-		colorInvertButton = findViewById(R.id.color_invert_button);
-		colorInvertButton.setOnClickListener(new View.OnClickListener() {
+		luminanceInvertButton = findViewById(R.id.color_invert_button);
+		luminanceInvertButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i(APP, "Inverted colour");
-				pageView.isColorInverted = !pageView.isColorInverted;
+				isLuminanceInverted = !isLuminanceInverted;
 				loadPage();
 			}
 		});
@@ -719,7 +713,7 @@ public class DocumentActivity extends Activity
 					}
 					if (zoom != 1)
 						ctm.scale(zoom);
-					bitmap = AndroidDrawDevice.drawPage(page, ctm);
+					bitmap = AndroidDrawDevice.drawPage(page, ctm, isLuminanceInverted);
 				} catch (Throwable x) {
 					Log.e(APP, x.getMessage());
 				}
