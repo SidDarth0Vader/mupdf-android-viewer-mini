@@ -92,7 +92,7 @@ public class DocumentActivity extends Activity
 	protected boolean stopSearch;
 	protected Stack<Integer> history;
 	protected boolean wentBack;
-	protected boolean isLuminanceInverted;
+	protected boolean invertLuminance;
 
 	private String toHex(byte[] digest) {
 		StringBuilder builder = new StringBuilder(2 * digest.length);
@@ -235,6 +235,7 @@ public class DocumentActivity extends Activity
 		prefs = getPreferences(Context.MODE_PRIVATE);
 		layoutEm = prefs.getFloat("layoutEm", 8);
 		fitPage = prefs.getBoolean("fitPage", false);
+		invertLuminance = prefs.getBoolean("invertLuminance", false);
 		currentPage = prefs.getInt(key, 0);
 		searchHitPage = -1;
 		hasLoaded = false;
@@ -262,7 +263,7 @@ public class DocumentActivity extends Activity
 		luminanceInvertButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.i(APP, "Inverted colour");
-				isLuminanceInverted = !isLuminanceInverted;
+				invertLuminance = !invertLuminance;
 				loadPage();
 			}
 		});
@@ -480,6 +481,7 @@ public class DocumentActivity extends Activity
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putFloat("layoutEm", layoutEm);
 			editor.putBoolean("fitPage", fitPage);
+			editor.putBoolean("invertLuminance", invertLuminance);
 			editor.putInt(key, currentPage);
 			editor.apply();
 		}
@@ -713,7 +715,7 @@ public class DocumentActivity extends Activity
 					}
 					if (zoom != 1)
 						ctm.scale(zoom);
-					bitmap = AndroidDrawDevice.drawPage(page, ctm, isLuminanceInverted);
+					bitmap = AndroidDrawDevice.drawPage(page, ctm, invertLuminance);
 				} catch (Throwable x) {
 					Log.e(APP, x.getMessage());
 				}
